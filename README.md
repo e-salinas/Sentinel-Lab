@@ -190,10 +190,3 @@ Closed the incident with classification:
 | KQL threat hunting results | `kql-hunting.png` |
 | NSG block rule | `nsg-block-rule.png` |
 | Incident closed with classification | `incident-closed.png` |
-
----
-
-## Connect With Me
-
-- LinkedIn: [Your LinkedIn URL]
-- GitHub: [Your GitHub URL]
