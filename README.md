@@ -121,9 +121,7 @@ Connected to the VM via SSH and disabled the host firewall to ensure nothing blo
 ```bash
 sudo ufw disable
 ```
-
-<!-- Add your screenshot -->
-![SSH Connected](screenshots/ssh-connected.png)
+![Disabled ufw](screenshots/disabled-ufw.png)
 
 Within hours, attackers found the exposed VM and started brute force attempts.
 
