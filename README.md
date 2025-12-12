@@ -6,23 +6,7 @@
 
 ## Summary
 
-Deployed a Microsoft Sentinel SIEM environment in Azure to detect, investigate, and respond to real-world SSH brute force attacks. Within 24 hours, detected **223 failed login attempts** from multiple attackers. Completed the full SOC Tier 1 workflow: triaged alerts, investigated incidents using KQL, documented findings, blocked attacker IPs, and closed incidents with proper classification.
-
----
-
-## What I Did
-
-| Task | What I Demonstrated |
-|------|---------------------|
-| Deployed Microsoft Sentinel | Set up a cloud SIEM from scratch in Azure |
-| Configured data ingestion | Connected Syslog and Azure Activity logs using Data Collection Rules |
-| Built detection rule | Wrote KQL query to detect 5+ failed SSH logins from same IP |
-| Configured entity mapping | Extracted attacker IPs and usernames so they appear in incidents |
-| Detected real attacks | Caught 223 brute force attempts from live attackers |
-| Investigated incidents | Analyzed alerts, identified 2 attacker IPs targeting 7 usernames |
-| Performed threat hunting | Wrote KQL queries to find attack patterns |
-| Took remediation action | Blocked attacker IPs in Network Security Group |
-| Closed incidents | Documented findings and classified as True Positive |
+Built a Microsoft Sentinel SIEM environment in Azure to detect, investigate, and respond to real-world SSH brute force attacks. Within 24 hours, detected **223 failed login attempts** from multiple attackers targeting service accounts. Investigated incidents, blocked attacker IPs, and closed cases with proper documentation.
 
 ---
 
@@ -30,48 +14,133 @@ Deployed a Microsoft Sentinel SIEM environment in Azure to detect, investigate, 
 
 - **Microsoft Sentinel** – SIEM for log analysis and incident management
 - **Microsoft Defender XDR** – Unified security portal
-- **Log Analytics Workspace** – Stores ingested logs
-- **KQL (Kusto Query Language)** – Queries for detection and hunting
-- **Azure Virtual Machine** – Ubuntu honeypot to attract attackers
-- **Network Security Groups** – Firewall rules to block attackers
+- **Log Analytics Workspace** – Log storage and query engine
+- **KQL (Kusto Query Language)** – Detection and threat hunting queries
+- **Azure Virtual Machine** – Ubuntu honeypot
+- **Network Security Groups** – Firewall rules for remediation
 
 ---
 
-## Lab Setup
+## Lab Architecture
 
 ```
-    ┌─────────────────┐
-    │    INTERNET     │
-    │    Attackers    │
-    │  (Brute Force)  │
-    └────────┬────────┘
-             │
-             ▼
+                    ┌─────────────────┐
+                    │    INTERNET     │
+                    │    Attackers    │
+                    │  (Brute Force)  │
+                    └────────┬────────┘
+                             │
+                             ▼
 ┌──────────────────────────────────────────────────────────────────┐
 │                         AZURE CLOUD                              │
 │                                                                  │
-│   ┌─────────────────┐         ┌─────────────────────────────┐    │
-│   │  Ubuntu VM      │         │   Log Analytics Workspace   │    │
-│   │  (Honeypot)     │────────▶│                             │    │
-│   │                 │ Syslog  │   ┌─────────────────────┐   │    │
-│   │ • SSH Exposed   │  via    │   │ Microsoft Sentinel  │   │    │
-│   │ • Firewall Off  │  AMA    │   │ • Analytics Rules   │   │    │
-│   │ • Port 22 Open  │         │   │ • Incidents         │   │    │
-│   └─────────────────┘         │   │ • Workbooks         │   │    │
-│                               │   │ • Entity Mapping    │   │    │
-│                               │   └─────────────────────┘   │    │
-│                               └─────────────────────────────┘    │
+│   ┌─────────────────┐         ┌─────────────────────────────┐   │
+│   │  Ubuntu VM      │         │   Log Analytics Workspace   │   │
+│   │  (Honeypot)     │────────▶│                             │   │
+│   │                 │ Syslog  │   ┌─────────────────────┐   │   │
+│   │ • SSH Exposed   │  via    │   │ Microsoft Sentinel  │   │   │
+│   │ • Firewall Off  │  AMA    │   │ • Analytics Rules   │   │   │
+│   │ • Port 22 Open  │         │   │ • Incidents         │   │   │
+│   └─────────────────┘         │   │ • Workbooks         │   │   │
+│                               │   │ • Entity Mapping    │   │   │
+│                               │   └─────────────────────┘   │   │
+│                               └─────────────────────────────┘   │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-I deployed an Ubuntu VM with SSH exposed to the internet and all firewall rules disabled. This created a honeypot that attracted real attackers. The VM sent authentication logs to Sentinel, where my detection rule generated alerts when brute force attempts occurred.
+---
+
+## Setting Up the Environment
+
+### Created the Azure Infrastructure
+
+Started by creating a Resource Group to organize all lab resources in one place. This makes it easy to manage and delete everything when the lab is complete.
+
+<!-- Add your screenshot -->
+![Resource Group](screenshots/resource-group.png)
+
+Next, created a Log Analytics Workspace. This is where all the security logs get stored and where Sentinel runs its queries.
+
+<!-- Add your screenshot -->
+![Log Analytics Workspace](screenshots/log-analytics-workspace.png)
+
+### Deployed Microsoft Sentinel
+
+Added Microsoft Sentinel to the Log Analytics Workspace. Sentinel is the SIEM that analyzes logs, generates alerts, and manages incidents.
+
+<!-- Add your screenshot -->
+![Sentinel Enabled](screenshots/sentinel-enabled.png)
 
 ---
 
-## Detection Rule
+## Configuring Data Ingestion
 
-Created a scheduled analytics rule that triggers when an IP has 5+ failed SSH login attempts:
+### Installed the Syslog Solution
 
+From the Content Hub, installed the Syslog solution to enable Linux log collection. This provides the data connector needed to pull authentication logs from the honeypot VM.
+
+<!-- Add your screenshot -->
+![Content Hub](screenshots/content-hub.png)
+
+### Created a Data Collection Rule
+
+Configured a Data Collection Rule (DCR) to specify which logs to collect and where to send them. Set it to collect LOG_AUTH events, which capture all authentication activity including failed SSH logins.
+
+<!-- Add your screenshot -->
+![Data Collection Rule](screenshots/data-collection-rule.png)
+
+### Connected Azure Activity Logs
+
+Also connected Azure Activity to monitor any changes made in the Azure environment itself.
+
+<!-- Add your screenshot -->
+![Data Connectors](screenshots/data-connectors.png)
+
+---
+
+## Deploying the Honeypot
+
+### Created an Ubuntu VM
+
+Deployed an Ubuntu Server VM with SSH exposed to the internet. This serves as the honeypot to attract real attackers.
+
+<!-- Add your screenshot -->
+![VM Created](screenshots/vm-created.png)
+
+### Opened the Firewall
+
+Configured the Network Security Group to allow ALL inbound traffic. This makes the VM discoverable by attackers scanning the internet.
+
+<!-- Add your screenshot -->
+![NSG Allow All](screenshots/nsg-allow-all.png)
+
+### Disabled Host Firewall
+
+Connected to the VM via SSH and disabled the host firewall to ensure nothing blocks incoming connection attempts.
+
+```bash
+sudo ufw disable
+```
+
+<!-- Add your screenshot -->
+![SSH Connected](screenshots/ssh-connected.png)
+
+Within hours, attackers found the exposed VM and started brute force attempts.
+
+---
+
+## Building the Detection Rule
+
+### Created a Scheduled Analytics Rule & Configured Entity Mapping
+
+Built a custom analytics rule to detect brute force attacks. The rule triggers when an IP address has 5 or more failed SSH login attempts.
+
+Added entity mapping so the attacker IP and targeted username appear directly in incidents. This saves time during investigation—no need to dig through raw logs to find the key details.
+
+- **IP Entity** → `Attacker_IP`
+- **Account Entity** → `TargetUsername`
+
+**KQL Detection Query:**
 ```kql
 Syslog
 | where Facility == "auth"
@@ -81,10 +150,6 @@ Syslog
 | summarize FailedAttempts = count() by Attacker_IP, TargetUsername, HostName
 | where FailedAttempts >= 5
 ```
-
-I configured **entity mapping** so the attacker IP and targeted username appear directly in the incident. This makes investigation faster—I don't have to dig through raw logs to find the key information.
-
-<!-- Add your screenshot -->
 ![Analytics Rule](screenshots/analytics-rule.png)
 
 ---
@@ -96,77 +161,63 @@ Within 24 hours, the honeypot detected:
 | Metric | Value |
 |--------|-------|
 | Total failed login attempts | 223 |
-| Attacker IPs identified | Multiple |
-| Usernames targeted | 9 |
 | Top targeted account | root (21 attempts) |
 
-**Targeted usernames:** `root`, `postgres`, `mysql`, `ubuntu`, `test`, `user`, and others
+**Targeted usernames:** `root`, `postgres`, `mysql`, `ubuntu`, `test`, `user`
 
-The attackers targeted common service accounts (postgres, mysql) and default accounts (root, ubuntu). This indicates automated credential stuffing—bots scanning the internet for weak SSH passwords.
+The attackers went after common service accounts (postgres, mysql) and default accounts (root, ubuntu). This pattern indicates automated credential stuffing—bots scanning the internet for weak SSH passwords.
 
-<!-- Add your screenshot -->
-![KQL Results](screenshots/kql-hunting.png)
+![KQL Results](screenshots/kql-results.png)
 
 ---
 
-## Incident Investigation
+## Investigating the Incident
 
-When the alerts triggered, I performed the standard SOC Tier 1 workflow:
+When alerts triggered, Sentinel grouped them into an incident. The investigation graph showed:
 
-### 1. Triage
-Reviewed the incident in Sentinel. The investigation graph showed:
 - **2 attacker IPs**: `159.223.225.34` and `152.42.13.239`
-- **7 targeted usernames**: Service and default accounts
-- **16 alerts** grouped into one incident over 2 hours
+- **7 targeted usernames**
+- **16 alerts** over 2 hours
 
-<!-- Add your screenshot -->
+![Incidents](screenshots/incidents.png)
+
 ![Investigation Graph](screenshots/investigation-graph.png)
 
-### 2. Investigation
-Ran KQL queries to understand the attack scope:
+## Responding to the Threat
 
-```kql
-Syslog
-| where Facility == "auth"
-| where SyslogMessage contains "Failed password"
-| where TimeGenerated > ago(24h)
-| extend Attacker_IP = extract(@"from\s([0-9\.]+)", 1, SyslogMessage)
-| extend Username = extract(@"for\s(?:invalid user\s)?(\S+)", 1, SyslogMessage)
-| summarize Attempts = count() by Attacker_IP, Username
-| sort by Attempts desc
-```
+### Documented Findings
 
-### 3. Documentation
 Added investigation notes to the incident:
 
 > "Investigated brute force attempt from 159.223.225.34 and 152.42.13.239 targeting 7 service accounts. 16 alerts over 2 hours indicates automated attack. Confirmed malicious. Taking remediation action - blocking IPs in NSG."
 
-### 4. Remediation
-Blocked both attacker IPs in the Network Security Group:
+### Blocked Attacker IPs
 
-<!-- Add your screenshot -->
+Created a Deny rule in the Network Security Group to block both attacker IPs from reaching the honeypot.
+
 ![NSG Block Rule](screenshots/nsg-block-rule.png)
 
-### 5. Closure
-Closed the incident with classification:
+### Closed the Incident
+
+Resolved the incident with proper classification:
+
 - **Status**: Resolved
 - **Classification**: True Positive – Suspicious activity
 - **Closing note**: "Remediation complete. Blocked attacker IPs in NSG. Incident closed."
 
-<!-- Add your screenshot -->
 ![Incident Closed](screenshots/incident-closed.png)
 
 ---
 
 ## What I Learned
 
-**Entity mapping matters.** My first version of the detection rule didn't have entity mapping configured. Incidents showed alerts but no attacker details. After adding entity mapping, the IP and username appeared right in the incident—exactly how it should work in a production SOC.
+**Entity mapping makes a difference.** My first version of the detection rule worked but didn't show attacker details in the incident view. After adding entity mapping, the IP and username appeared right in the incident—the way it should work in a production SOC.
 
-**Attackers are fast.** Within hours of exposing the VM, automated scanners found it. This reinforced why defense in depth is critical—firewalls, strong passwords, and monitoring all work together.
+**Attackers move fast.** Within hours of exposing the VM, automated scanners found it. This reinforced why defense in depth matters—firewalls, strong passwords, and monitoring all work together.
 
-**KQL enables quick investigation.** Instead of scrolling through raw logs, I wrote queries to summarize attacker activity in seconds. This is how analysts scale their work.
+**KQL speeds up investigation.** Instead of scrolling through raw logs, I wrote queries to summarize attacker activity in seconds. This is how analysts handle volume.
 
-**Documentation closes the loop.** Adding investigation notes and proper classification creates an audit trail. If another analyst sees this incident, they know exactly what happened and what action was taken.
+**Documentation closes the loop.** Adding investigation notes and proper classification creates an audit trail. If another analyst looks at this incident, they know exactly what happened and what action was taken.
 
 ---
 
@@ -182,11 +233,19 @@ Closed the incident with classification:
 
 | Description | File |
 |-------------|------|
-| Sentinel overview with data | `sentinel-overview.png` |
-| Data connectors connected | `data-connectors.png` |
-| Analytics rule with entity mapping | `analytics-rule.png` |
-| Incidents triggered | `incidents.png` |
-| Investigation graph showing IPs and users | `investigation-graph.png` |
-| KQL threat hunting results | `kql-hunting.png` |
+| Resource Group | `resource-group.png` |
+| Log Analytics Workspace | `log-analytics-workspace.png` |
+| Sentinel enabled | `sentinel-enabled.png` |
+| Content Hub | `content-hub.png` |
+| Data Collection Rule | `data-collection-rule.png` |
+| Data connectors | `data-connectors.png` |
+| VM created | `vm-created.png` |
+| NSG allow all rule | `nsg-allow-all.png` |
+| SSH connected | `ssh-connected.png` |
+| Analytics rule | `analytics-rule.png` |
+| Entity mapping | `entity-mapping.png` |
+| KQL results | `kql-results.png` |
+| Incidents | `incidents.png` |
+| Investigation graph | `investigation-graph.png` |
 | NSG block rule | `nsg-block-rule.png` |
-| Incident closed with classification | `incident-closed.png` |
+| Incident closed | `incident-closed.png` |
