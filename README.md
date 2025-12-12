@@ -201,7 +201,7 @@ Resolved the incident with proper classification:
 
 - **Status**: Resolved
 - **Classification**: True Positive – Suspicious activity
-- **Closing note**: "Remediation complete. Blocked attacker IPs in NSG. Incident closed."
+- **Closing note**: "Took remediation action - bloacked IPs in NSG."
 
 ![Incident Closed](screenshots/incident-closed.png)
 
@@ -213,7 +213,7 @@ Resolved the incident with proper classification:
 
 **Attackers move fast.** Within hours of exposing the VM, automated scanners found it. This reinforced why defense in depth matters—firewalls, strong passwords, and monitoring all work together.
 
-**KQL speeds up investigation.** Instead of scrolling through raw logs, I wrote queries to summarize attacker activity in seconds. This is how analysts handle volume.
+**KQL speeds up investigation.** Instead of scrolling through raw logs, I wrote queries to summarize attacker activity in seconds.
 
 **Documentation closes the loop.** Adding investigation notes and proper classification creates an audit trail. If another analyst looks at this incident, they know exactly what happened and what action was taken.
 
@@ -225,25 +225,3 @@ Resolved the incident with proper classification:
 |--------|-----------|-----|
 | Credential Access | Brute Force | T1110 |
 
----
-
-## Screenshots
-
-| Description | File |
-|-------------|------|
-| Resource Group | `resource-group.png` |
-| Log Analytics Workspace | `log-analytics-workspace.png` |
-| Sentinel enabled | `sentinel-enabled.png` |
-| Content Hub | `content-hub.png` |
-| Data Collection Rule | `data-collection-rule.png` |
-| Data connectors | `data-connectors.png` |
-| VM created | `vm-created.png` |
-| NSG allow all rule | `nsg-allow-all.png` |
-| SSH connected | `ssh-connected.png` |
-| Analytics rule | `analytics-rule.png` |
-| Entity mapping | `entity-mapping.png` |
-| KQL results | `kql-results.png` |
-| Incidents | `incidents.png` |
-| Investigation graph | `investigation-graph.png` |
-| NSG block rule | `nsg-block-rule.png` |
-| Incident closed | `incident-closed.png` |
