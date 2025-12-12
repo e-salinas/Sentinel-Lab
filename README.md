@@ -34,17 +34,17 @@ Built a Microsoft Sentinel SIEM environment in Azure to detect, investigate, and
 ┌──────────────────────────────────────────────────────────────────┐
 │                         AZURE CLOUD                              │
 │                                                                  │
-│   ┌─────────────────┐         ┌─────────────────────────────┐   │
-│   │  Ubuntu VM      │         │   Log Analytics Workspace   │   │
-│   │  (Honeypot)     │────────▶│                             │   │
-│   │                 │ Syslog  │   ┌─────────────────────┐   │   │
-│   │ • SSH Exposed   │  via    │   │ Microsoft Sentinel  │   │   │
-│   │ • Firewall Off  │  AMA    │   │ • Analytics Rules   │   │   │
-│   │ • Port 22 Open  │         │   │ • Incidents         │   │   │
-│   └─────────────────┘         │   │ • Workbooks         │   │   │
-│                               │   │ • Entity Mapping    │   │   │
-│                               │   └─────────────────────┘   │   │
-│                               └─────────────────────────────┘   │
+│   ┌─────────────────┐         ┌─────────────────────────────┐    │
+│   │  Ubuntu VM      │         │   Log Analytics Workspace   │    │
+│   │  (Honeypot)     │────────▶│                             │    │
+│   │                 │ Syslog  │   ┌─────────────────────┐   │    │
+│   │ • SSH Exposed   │  via    │   │ Microsoft Sentinel  │   │    │
+│   │ • Firewall Off  │  AMA    │   │ • Analytics Rules   │   │    │
+│   │ • Port 22 Open  │         │   │ • Incidents         │   │    │
+│   └─────────────────┘         │   │ • Workbooks         │   │    │
+│                               │   │ • Entity Mapping    │   │    │
+│                               │   └─────────────────────┘   │    │
+│                               └─────────────────────────────┘    │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -56,19 +56,16 @@ Built a Microsoft Sentinel SIEM environment in Azure to detect, investigate, and
 
 Started by creating a Resource Group to organize all lab resources in one place. This makes it easy to manage and delete everything when the lab is complete.
 
-<!-- Add your screenshot -->
 ![Resource Group](screenshots/resource-group.png)
 
 Next, created a Log Analytics Workspace. This is where all the security logs get stored and where Sentinel runs its queries.
 
-<!-- Add your screenshot -->
 ![Log Analytics Workspace](screenshots/log-analytics-workspace.png)
 
 ### Deployed Microsoft Sentinel
 
 Added Microsoft Sentinel to the Log Analytics Workspace. Sentinel is the SIEM that analyzes logs, generates alerts, and manages incidents.
 
-<!-- Add your screenshot -->
 ![Sentinel Enabled](screenshots/sentinel-enabled.png)
 
 ---
@@ -79,21 +76,18 @@ Added Microsoft Sentinel to the Log Analytics Workspace. Sentinel is the SIEM th
 
 From the Content Hub, installed the Syslog solution to enable Linux log collection. This provides the data connector needed to pull authentication logs from the honeypot VM.
 
-<!-- Add your screenshot -->
 ![Content Hub](screenshots/content-hub.png)
 
 ### Created a Data Collection Rule
 
 Configured a Data Collection Rule (DCR) to specify which logs to collect and where to send them. Set it to collect LOG_AUTH events, which capture all authentication activity including failed SSH logins.
 
-<!-- Add your screenshot -->
 ![Data Collection Rule](screenshots/data-collection-rule.png)
 
 ### Connected Azure Activity Logs
 
 Also connected Azure Activity to monitor any changes made in the Azure environment itself.
 
-<!-- Add your screenshot -->
 ![Data Connectors](screenshots/data-connectors.png)
 
 ---
@@ -104,14 +98,12 @@ Also connected Azure Activity to monitor any changes made in the Azure environme
 
 Deployed an Ubuntu Server VM with SSH exposed to the internet. This serves as the honeypot to attract real attackers.
 
-<!-- Add your screenshot -->
 ![VM Created](screenshots/vm-created.png)
 
 ### Opened the Firewall
 
 Configured the Network Security Group to allow ALL inbound traffic. This makes the VM discoverable by attackers scanning the internet.
 
-<!-- Add your screenshot -->
 ![NSG Allow All](screenshots/nsg-allow-all.png)
 
 ### Disabled Host Firewall
