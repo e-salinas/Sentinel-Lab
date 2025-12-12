@@ -1,4 +1,4 @@
-# Azure Sentinel SIEM Lab: Detecting & Responding to Live Brute Force Attacks
+# Microsoft Sentinel SIEM Lab: Detecting & Responding to Live Brute Force Attacks
 
 ![Microsoft Sentinel](https://img.shields.io/badge/Microsoft-Sentinel-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)
 ![Azure](https://img.shields.io/badge/Azure-Cloud-0089D6?style=for-the-badge&logo=microsoftazure&logoColor=white)
